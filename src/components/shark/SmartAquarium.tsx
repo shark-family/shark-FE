@@ -1,27 +1,69 @@
-"use client";
 import React from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import SensorAvailability from "./SensorAvailability";
+import SensorSummary from "./SensorSummary";
 import TankRow from "./TankRow";
 
 const SmartAquarium: React.FC = () => {
   return (
-    <main className="flex overflow-hidden flex-wrap gap-10 pr-14 bg-stone-50 max-md:pr-5">
-      <Sidebar />
-      <section className="flex flex-col grow shrink-0 items-center my-auto basis-0 w-fit max-md:max-w-full">
+    <main className="flex flex-wrap bg-stone-50 min-h-screen">
+      <div className="w-full md:w-1/5 p-4">
+        <Sidebar />
+      </div>
+      <div className="w-full md:w-4/5 p-4">
         <Header />
-        <h1 className="mt-16 text-3xl font-semibold leading-none text-black max-md:mt-10 max-md:max-w-full">
-          공주대학교 스마트양식장 대쉬보드
-        </h1>
-        <SensorAvailability />
-        <div className="mt-14 max-w-full w-[1172px] max-md:mt-10">
-          <TankRow tanks={["A", "B", "C", "D"]} />
-        </div>
-        <div className="flex flex-wrap gap-10 items-center mt-10 max-md:max-w-full">
-          <TankRow tanks={["E", "F", "G", "H"]} />
-        </div>
-      </section>
+        <h1 className="mt-10 text-3xl font-semibold text-black">공주대학교 스마트양식장 대시보드</h1>
+        <SensorSummary sensors={[
+          { icon: "/염도.png", name: "염도", count: 1 },
+          { icon: "/암모니아.png", name: "암모니아", count: 1 },
+          { icon: "/용존산소.png", name: "용존 산소", count: 1 },
+          { icon: "/PH.png", name: "PH", count: 1 },
+          { icon: "/탁도.png", name: "탁도", count: 1 },
+          { icon: "/온도.png", name: "온도", count: 1 },
+        ]} />
+        <TankRow tankData={{
+          A: [
+            { icon: "/온도.png", name: "온도" },
+            { icon: "/용존산소.png", name: "용존 산소" },
+            { icon: "/염도.png", name: "염도" },
+          ],
+          B: [
+            { icon: "/PH.png", name: "PH" },
+            { icon: "/암모니아.png", name: "암모니아" },
+            { icon: "/탁도.png", name: "탁도" },
+          ],
+          C: [
+            { icon: "/온도.png", name: "온도" },
+            { icon: "/암모니아.png", name: "암모니아" },
+            { icon: "/용존산소.png", name: "용존 산소" },
+          ],
+          D: [
+            { icon: "/염도.png", name: "염도" },
+            { icon: "/탁도.png", name: "탁도" },
+            { icon: "/용존산소.png", name: "용존 산소" },
+          ],
+          E: [
+            { icon: "/온도.png", name: "온도" },
+            { icon: "/용존산소.png", name: "용존 산소" },
+            { icon: "/염도.png", name: "염도" },
+          ],
+          F: [
+            { icon: "/PH.png", name: "PH" },
+            { icon: "/암모니아.png", name: "암모니아" },
+            { icon: "/탁도.png", name: "탁도" },
+          ],
+          G: [
+            { icon: "/온도.png", name: "온도" },
+            { icon: "/암모니아.png", name: "암모니아" },
+            { icon: "/용존산소.png", name: "용존 산소" },
+          ],
+          H: [
+            { icon: "/염도.png", name: "염도" },
+            { icon: "/탁도.png", name: "탁도" },
+            { icon: "/용존산소.png", name: "용존 산소" },
+          ],
+        }} />
+      </div>
     </main>
   );
 };
