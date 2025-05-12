@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import {
   Home,
   Map,
@@ -15,11 +14,21 @@ import SalinityIcon from '../../assets/salinity.svg';
 import TurbidityIcon from '../../assets/turbidity.svg';
 import SensorBox from './SensorBox';
 import SensorActivationModal from './SensorActivationModal';
+import axiosInstance from '../../axiosInstance';
+import LogModal from './LogModal';
+
+interface LogEntry {
+  sensor_type: string;
+  user_name: string;
+  started_at: string;
+  stopped_at: string | null;
+}
 
 interface SensorBoxProps {
   name: string;
-  sensors: string[];
+  sensors: { type: string; value: string }[];
   status: string;
+  aquarium_id: number;
 }
 
 const sensorIconMap: Record<string, { label: string; icon: string; bgColor: string }> = {
@@ -33,33 +42,49 @@ const sensorIconMap: Record<string, { label: string; icon: string; bgColor: stri
 
 const SmartAquarium: React.FC = () => {
   const [tankData, setTankData] = useState<SensorBoxProps[]>([]);
+  const [allSensors, setAllSensors] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedTank, setSelectedTank] = useState<string | null>(null);
+  const [logModalOpen, setLogModalOpen] = useState(false);
+  const [selectedLogs, setSelectedLogs] = useState<LogEntry[]>([]);
+  const [selectedTankName, setSelectedTankName] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('/api/user-info/your_username');
-        interface Tank {
-          name: string;
-          activeSensors: string[];
-          status: string;
-        }
+        const res = await axiosInstance.get('/api/user-info/관리자C');
 
-        const aquariums = res.data.aquariums.map((tank: Tank) => ({
-          name: tank.name,
-          sensors: tank.activeSensors.map((type: string) => {
-            switch (type.toLowerCase()) {
-              case 'ph': return 'PH';
-              case 'nh4': return '암모니아';
-              default: return type;
-            }
-          }),
-          status: tank.status,
-        }));
+        // 센서 목록 처리
+        const typeMap: Record<string, string> = {
+          ph: 'PH',
+          nh4: '암모니아',
+          do: '용존 산소',
+          temp: '온도',
+          salt: '염도',
+          turb: '탁도',
+        };
+        const sensorTypes = res.data.sensors.map((s: any) =>
+          typeMap[s.type?.toLowerCase?.()] || s.type
+        );
+        setAllSensors(sensorTypes);
+
+        // 수조 정보 처리
+        const aquariums = res.data.aquariums.map((tank: any) => {
+          const sensors = (tank.activeSensors || []).map((sensor: any) => ({
+            type: typeMap[sensor.type?.toLowerCase?.()] || sensor.type,
+            value: sensor.value,
+          }));
+
+          return {
+            name: tank.name,
+            sensors,
+            status: tank.status,
+            aquarium_id: tank.aquarium_id,
+          };
+        });
         setTankData(aquariums);
       } catch (err) {
-        console.error('Error fetching tank data:', err);
+        console.error('❌ 데이터 불러오기 실패:', err);
       }
     };
 
@@ -81,7 +106,6 @@ const SmartAquarium: React.FC = () => {
       setShowModal(true);
     }
   };
-  
 
   const handleCloseModal = () => {
     setSelectedTank(null);
@@ -93,11 +117,18 @@ const SmartAquarium: React.FC = () => {
     console.log('관리자 ID:', managerId);
     console.log('선택된 센서:', selectedSensors);
     console.log('대상 수조:', tankName);
-  
-    // TODO: 여기에 실제 서버 전송 로직을 추가할 수 있어요.
-    // 예: axios.post('/api/sensor-activate', { managerId, selectedSensors, tankName });
   };
-  
+
+  const handleLogClick = async (aquariumId: number, tankName: string) => {
+    try {
+      const res = await axiosInstance.get(`/api/aquarium-log/${aquariumId}`);
+      setSelectedLogs(res.data.logs);
+      setSelectedTankName(tankName);
+      setLogModalOpen(true);
+    } catch (err) {
+      console.error('❌ 로그 불러오기 실패:', err);
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -142,13 +173,15 @@ const SmartAquarium: React.FC = () => {
             }).replace(/\. /g, '.').replace(/\.$/, '')}
           </div>
         </div>
+
         <h1 className="text-2xl font-bold mb-4 text-center">공주대학교 스마트양식장 대시보드</h1>
 
+        {/* ✅ 가용 센서 현황 */}
         <div className="bg-white rounded-3xl p-4 mb-6 shadow-sm mx-auto w-fit">
-          <h3 className="text-xl text-gray-700 mb-6 font-semibold text-[#303030] ">가용 센서 현황</h3>
-          <div className="flex gap-6 flex-wrap justify-center ">
-            {['염도', '탁도', '용존 산소', '암모니아', '온도', 'PH'].map((item, i) => {
-              const sensor = sensorIconMap[item];
+          <h3 className="text-xl text-gray-700 mb-6 font-semibold text-[#303030]">가용 센서 현황</h3>
+          <div className="flex gap-6 flex-wrap justify-center">
+            {Array.from(new Set(allSensors)).map((type, i) => {
+              const sensor = sensorIconMap[type];
               return (
                 <div key={i} className="flex flex-col items-center text-sm text-gray-700 w-24">
                   <div className="flex items-center justify-center gap-2">
@@ -164,6 +197,7 @@ const SmartAquarium: React.FC = () => {
           </div>
         </div>
 
+        {/* ✅ 수조 카드 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {tankData.map((tank, idx) => (
             <SensorBox
@@ -172,16 +206,26 @@ const SmartAquarium: React.FC = () => {
               sensors={tank.sensors}
               status={tank.status}
               onClick={() => handleOpenModal(tank.name, tank.status)}
+              onLogClick={() => handleLogClick(tank.aquarium_id, tank.name)}
             />
           ))}
         </div>
       </main>
 
+      {/* ✅ 모달 */}
       {showModal && selectedTank && (
         <SensorActivationModal
-        tankName={selectedTank}
-        onClose={handleCloseModal}
-        onConfirm={handleSensorConfirm}
+          tankName={selectedTank}
+          onClose={handleCloseModal}
+          onConfirm={handleSensorConfirm}
+        />
+      )}
+
+      {logModalOpen && (
+        <LogModal
+          logs={selectedLogs}
+          tankName={selectedTankName}
+          onClose={() => setLogModalOpen(false)}
         />
       )}
     </div>
