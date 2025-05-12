@@ -35,10 +35,14 @@ const SensorActivationModal: React.FC<SensorActivationModalProps> = ({
     }
   };
 
+  const handleRemoveSensor = (sensor: string) => {
+    setSensorList(sensorList.filter(s => s !== sensor));
+  };
+
   const handleConfirm = async () => {
     if (!managerId || sensorList.length === 0) return;
     onConfirm(managerId, sensorList, tankName);
-  
+
     try {
       for (const sensorType of sensorList) {
         const sensorId = allSensors.find(s => s.type === sensorType)?.id;
@@ -98,9 +102,10 @@ const SensorActivationModal: React.FC<SensorActivationModalProps> = ({
             {sensorList.map((sensor, idx) => (
               <span
                 key={idx}
-                className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full"
+                className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full flex items-center gap-1"
               >
                 {sensor}
+                <button onClick={() => handleRemoveSensor(sensor)} className="text-red-400 ml-1">×</button>
               </span>
             ))}
           </div>

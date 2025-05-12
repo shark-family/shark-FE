@@ -52,41 +52,41 @@ const SmartAquarium: React.FC = () => {
   const [selectedLogs, setSelectedLogs] = useState<LogEntry[]>([]);
   const [selectedTankName, setSelectedTankName] = useState<string>('');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axiosInstance.get('/api/user-info/관리자A');
-        const typeMap: Record<string, string> = {
-          ph: 'PH', nh4: '암모니아', do: '용존 산소', temp: '온도', salt: '염도', turbi: '탁도'
-        };
+  const refetchData = async () => {
+    try {
+      const res = await axiosInstance.get('/api/user-info/관리자A');
+      const typeMap: Record<string, string> = {
+        ph: 'PH', nh4: '암모니아', do: '용존 산소', temp: '온도', salt: '염도', turbi: '탁도'
+      };
 
-        const sensors = res.data.sensors.map((s: any) => ({
-          type: typeMap[s.type?.toLowerCase?.()] || s.type,
-          id: s.id,
+      const sensors = res.data.sensors.map((s: any) => ({
+        type: typeMap[s.type?.toLowerCase?.()] || s.type,
+        id: s.id,
+      }));
+      setAllSensors(sensors);
+      setUserId(res.data.user_id);
+
+      const aquariums = res.data.aquariums.map((tank: any) => {
+        const sensors = (tank.activeSensors || []).map((sensor: any) => ({
+          type: typeMap[sensor.type?.toLowerCase?.()] || sensor.type,
+          value: sensor.value,
         }));
-        setAllSensors(sensors);
-        setUserId(res.data.user_id);
 
-        const aquariums = res.data.aquariums.map((tank: any) => {
-          const sensors = (tank.activeSensors || []).map((sensor: any) => ({
-            type: typeMap[sensor.type?.toLowerCase?.()] || sensor.type,
-            value: sensor.value,
-          }));
+        return {
+          name: tank.name,
+          sensors,
+          status: tank.status,
+          aquarium_id: tank.aquarium_id || tank.id,
+        };
+      });
+      setTankData(aquariums);
+    } catch (err) {
+      console.error('❌ 데이터 불러오기 실패:', err);
+    }
+  };
 
-          return {
-            name: tank.name,
-            sensors,
-            status: tank.status,
-            aquarium_id: tank.aquarium_id || tank.id,
-          };
-        });
-        setTankData(aquariums);
-      } catch (err) {
-        console.error('❌ 데이터 불러오기 실패:', err);
-      }
-    };
-
-    fetchData();
+  useEffect(() => {
+    refetchData();
   }, []);
 
   const handleOpenModal = (tank: SensorBoxProps) => {
@@ -111,6 +111,22 @@ const SmartAquarium: React.FC = () => {
       setLogModalOpen(true);
     } catch (err) {
       console.error('❌ 로그 불러오기 실패:', err);
+    }
+  };
+
+  const handleSensorStop = async (sensorType: string) => {
+    try {
+      const sensor = allSensors.find((s) => s.type === sensorType);
+      if (!sensor) return alert('센서 정보를 찾을 수 없습니다.');
+
+      const res = await axiosInstance.post('/api/stop-sensor', {
+        sensor_id: sensor.id,
+      });
+      alert(res.data.status || '센서 작동 중지 완료');
+      await refetchData();
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.status || '❌ 작동 중지 실패');
     }
   };
 
@@ -180,8 +196,10 @@ const SmartAquarium: React.FC = () => {
               name={tank.name}
               sensors={tank.sensors}
               status={tank.status}
+              aquariumId={tank.aquarium_id}
               onClick={() => handleOpenModal(tank)}
               onLogClick={() => handleLogClick(tank.aquarium_id, tank.name)}
+              onSensorStop={handleSensorStop}
             />
           ))}
         </div>
