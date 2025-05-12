@@ -1,40 +1,32 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../axiosInstance'; 
 
 interface SensorActivationModalProps {
   tankName: string;
   onClose: () => void;
   onConfirm: (managerId: string, selectedSensors: string[], tankName: string) => void;
+  allSensors: { type: string; id: number }[];
+  currentTankSensors: string[];
+  userId: number;
+  aquariumId: number;
 }
 
-const AVAILABLE_SENSORS = [
-  '용존산소', 'PH', '온도', '암모니아', '염도', '탁도',
-];
-
-const SENSOR_TYPE_MAP: Record<string, number> = {
-  '용존산소': 1,
-  'PH': 2,
-  '온도': 3,
-  '암모니아': 4,
-  '염도': 5,
-  '탁도': 6,
-};
-
-const TANK_NAME_TO_ID: Record<string, number> = {
-  'A수조': 1,
-  'B수조': 2,
-  'C수조': 3,
-  'D수조': 4,
-  'E수조': 5,
-  'F수조': 6,
-  'G수조': 7,
-  'H수조': 8,
-};
-
-const SensorActivationModal: React.FC<SensorActivationModalProps> = ({ tankName, onClose, onConfirm }) => {
-  const [managerId, setManagerId] = useState('');
+const SensorActivationModal: React.FC<SensorActivationModalProps> = ({
+  tankName,
+  onClose,
+  onConfirm,
+  allSensors,
+  currentTankSensors,
+  userId,
+  aquariumId,
+}) => {
+  const [managerId] = useState(userId.toString());
   const [selectedSensor, setSelectedSensor] = useState('');
   const [sensorList, setSensorList] = useState<string[]>([]);
+
+  const filteredAvailableSensors = allSensors.filter(
+    (sensor) => !sensorList.includes(sensor.type)
+  );
 
   const handleAddSensor = () => {
     if (selectedSensor && !sensorList.includes(selectedSensor) && sensorList.length < 3) {
@@ -44,24 +36,26 @@ const SensorActivationModal: React.FC<SensorActivationModalProps> = ({ tankName,
   };
 
   const handleConfirm = async () => {
-    if (managerId && sensorList.length > 0) {
-      onConfirm(managerId, sensorList, tankName);
-
-      const aquariumId = TANK_NAME_TO_ID[tankName];
-      const userId = parseInt(managerId, 10);
-      const sensorIds = sensorList.map(sensor => SENSOR_TYPE_MAP[sensor]);
-
-      try {
-        await axios.post('/api/activate-sensor', {
-          user_id: userId,
-          aquarium_id: aquariumId,
-          sensor_ids: sensorIds, // 리스트로 전송
-        });
-      } catch (err) {
-        console.error('❌ 센서 등록 실패:', err);
+    if (!managerId || sensorList.length === 0) return;
+    onConfirm(managerId, sensorList, tankName);
+  
+    try {
+      for (const sensorType of sensorList) {
+        const sensorId = allSensors.find(s => s.type === sensorType)?.id;
+        if (sensorId) {
+          const res = await axiosInstance.post('/api/start-sensor', {
+            user_id: Number(managerId),
+            aquarium_id: aquariumId,
+            sensor_id: sensorId,
+          });
+          console.log('✅ 등록 성공 응답:', res.data);
+        }
       }
-
       onClose();
+    } catch (err: any) {
+      console.error('❌ 등록 실패 응답:', err?.response);
+      const msg = err?.response?.data?.status || '❌ 센서 등록 중 오류가 발생했습니다.';
+      alert(msg);
     }
   };
 
@@ -70,18 +64,15 @@ const SensorActivationModal: React.FC<SensorActivationModalProps> = ({ tankName,
       <div className="bg-white rounded-3xl shadow-lg w-full max-w-md p-8">
         <h2 className="text-2xl font-bold mb-6">Sensor 가동 설정 - {tankName}</h2>
 
-        <label className="block text-sm mb-2">관리자 ID를 입력하세요.</label>
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={managerId}
-            onChange={(e) => setManagerId(e.target.value)}
-            className="border rounded-md flex-1 px-3 py-2"
-          />
-          <button className="text-sm text-blue-600 bg-blue-100 px-4 py-2 rounded-md">인증</button>
-        </div>
+        <label className="block text-sm mb-2">관리자 ID</label>
+        <input
+          type="text"
+          value={managerId}
+          disabled
+          className="border rounded-md px-3 py-2 mb-4 w-full bg-gray-100 text-gray-500"
+        />
 
-        <label className="block text-sm mb-2">사용할 센서를 입력하세요.</label>
+        <label className="block text-sm mb-2">사용할 센서</label>
         <div className="flex items-center gap-2 mb-4">
           <select
             value={selectedSensor}
@@ -89,19 +80,20 @@ const SensorActivationModal: React.FC<SensorActivationModalProps> = ({ tankName,
             className="border rounded-md px-3 py-2 flex-1"
           >
             <option value="">선택하기</option>
-            {AVAILABLE_SENSORS.map((sensor) => (
-              <option key={sensor} value={sensor}>{sensor}</option>
+            {filteredAvailableSensors.map((sensor) => (
+              <option key={sensor.type} value={sensor.type}>{sensor.type}</option>
             ))}
           </select>
           <button
             onClick={handleAddSensor}
             className="text-xl bg-gray-200 px-3 py-1 rounded-md"
-          >+
+          >
+            +
           </button>
         </div>
 
         <div className="mb-4">
-          <div className="text-sm text-gray-500 mb-1">선택된 센서:</div>
+          <div className="text-sm text-gray-500 mb-1">선택된 센서</div>
           <div className="flex gap-2 flex-wrap">
             {sensorList.map((sensor, idx) => (
               <span
@@ -116,9 +108,7 @@ const SensorActivationModal: React.FC<SensorActivationModalProps> = ({ tankName,
 
         <div className="flex justify-end gap-2 mt-6">
           <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-md text-sm">취소</button>
-          <button onClick={handleConfirm} className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">
-            확인
-          </button>
+          <button onClick={handleConfirm} className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">확인</button>
         </div>
       </div>
     </div>

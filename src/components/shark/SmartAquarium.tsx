@@ -1,3 +1,5 @@
+// ✅ SmartAquarium.tsx
+
 import React, { useEffect, useState } from 'react';
 import {
   Home,
@@ -42,9 +44,10 @@ const sensorIconMap: Record<string, { label: string; icon: string; bgColor: stri
 
 const SmartAquarium: React.FC = () => {
   const [tankData, setTankData] = useState<SensorBoxProps[]>([]);
-  const [allSensors, setAllSensors] = useState<string[]>([]);
+  const [allSensors, setAllSensors] = useState<{ type: string; id: number }[]>([]);
+  const [userId, setUserId] = useState<number>(0);
   const [showModal, setShowModal] = useState(false);
-  const [selectedTank, setSelectedTank] = useState<string | null>(null);
+  const [selectedTank, setSelectedTank] = useState<SensorBoxProps | null>(null);
   const [logModalOpen, setLogModalOpen] = useState(false);
   const [selectedLogs, setSelectedLogs] = useState<LogEntry[]>([]);
   const [selectedTankName, setSelectedTankName] = useState<string>('');
@@ -52,23 +55,18 @@ const SmartAquarium: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axiosInstance.get('/api/user-info/관리자C');
-
-        // 센서 목록 처리
+        const res = await axiosInstance.get('/api/user-info/관리자A');
         const typeMap: Record<string, string> = {
-          ph: 'PH',
-          nh4: '암모니아',
-          do: '용존 산소',
-          temp: '온도',
-          salt: '염도',
-          turb: '탁도',
+          ph: 'PH', nh4: '암모니아', do: '용존 산소', temp: '온도', salt: '염도', turbi: '탁도'
         };
-        const sensorTypes = res.data.sensors.map((s: any) =>
-          typeMap[s.type?.toLowerCase?.()] || s.type
-        );
-        setAllSensors(sensorTypes);
 
-        // 수조 정보 처리
+        const sensors = res.data.sensors.map((s: any) => ({
+          type: typeMap[s.type?.toLowerCase?.()] || s.type,
+          id: s.id,
+        }));
+        setAllSensors(sensors);
+        setUserId(res.data.user_id);
+
         const aquariums = res.data.aquariums.map((tank: any) => {
           const sensors = (tank.activeSensors || []).map((sensor: any) => ({
             type: typeMap[sensor.type?.toLowerCase?.()] || sensor.type,
@@ -79,7 +77,7 @@ const SmartAquarium: React.FC = () => {
             name: tank.name,
             sensors,
             status: tank.status,
-            aquarium_id: tank.aquarium_id,
+            aquarium_id: tank.aquarium_id || tank.id,
           };
         });
         setTankData(aquariums);
@@ -91,20 +89,9 @@ const SmartAquarium: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleOpenModal = (tankName: string, status: string) => {
-    if (status === '가동중') {
-      const confirmed = window.confirm('이 센서 박스를 중지하시겠습니까?');
-      if (confirmed) {
-        setTankData((prev) =>
-          prev.map((tank) =>
-            tank.name === tankName ? { ...tank, status: '비가동' } : tank
-          )
-        );
-      }
-    } else {
-      setSelectedTank(tankName);
-      setShowModal(true);
-    }
+  const handleOpenModal = (tank: SensorBoxProps) => {
+    setSelectedTank(tank);
+    setShowModal(true);
   };
 
   const handleCloseModal = () => {
@@ -113,10 +100,7 @@ const SmartAquarium: React.FC = () => {
   };
 
   const handleSensorConfirm = (managerId: string, selectedSensors: string[], tankName: string) => {
-    console.log('✅ 센서 설정 확인됨!');
-    console.log('관리자 ID:', managerId);
-    console.log('선택된 센서:', selectedSensors);
-    console.log('대상 수조:', tankName);
+    console.log('✅ 센서 설정 완료:', { managerId, selectedSensors, tankName });
   };
 
   const handleLogClick = async (aquariumId: number, tankName: string) => {
@@ -136,23 +120,14 @@ const SmartAquarium: React.FC = () => {
         <div>
           <h1 className="text-xl font-extrabold px-6 py-6 text-blue-600">Smart Aquarium</h1>
           <nav className="flex flex-col gap-2 px-4">
-            <a href="#" className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-blue-50">
+            <a className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-blue-50">
               <Home size={18} /> Measured Result
             </a>
-            <a href="#" className="flex items-center gap-2 p-2 rounded-lg text-blue-600 font-semibold bg-blue-100">
+            <a className="flex items-center gap-2 p-2 rounded-lg text-blue-600 font-semibold bg-blue-100">
               <Zap size={18} /> Sensor Control
             </a>
-            <a href="#" className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-blue-50">
+            <a className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-blue-50">
               <Map size={18} /> Detail Map
-            </a>
-          </nav>
-          <div className="mt-8 px-4 text-sm text-gray-500">Support</div>
-          <nav className="flex flex-col gap-2 px-4 mt-2">
-            <a href="#" className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-blue-50">
-              <HelpCircle size={18} /> Get Started
-            </a>
-            <a href="#" className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-blue-50">
-              <Settings size={18} /> Settings
             </a>
           </nav>
         </div>
@@ -167,27 +142,27 @@ const SmartAquarium: React.FC = () => {
           <h2 className="text-lg font-semibold">Sensor Control</h2>
           <div className="text-sm text-gray-500">
             {new Date().toLocaleDateString('ko-KR', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
+              year: 'numeric', month: '2-digit', day: '2-digit'
             }).replace(/\. /g, '.').replace(/\.$/, '')}
           </div>
         </div>
 
         <h1 className="text-2xl font-bold mb-4 text-center">공주대학교 스마트양식장 대시보드</h1>
 
-        {/* ✅ 가용 센서 현황 */}
+        {/* ✅ 센서 현황 */}
         <div className="bg-white rounded-3xl p-4 mb-6 shadow-sm mx-auto w-fit">
           <h3 className="text-xl text-gray-700 mb-6 font-semibold text-[#303030]">가용 센서 현황</h3>
           <div className="flex gap-6 flex-wrap justify-center">
-            {Array.from(new Set(allSensors)).map((type, i) => {
+            {Array.from(new Set(allSensors.map(s => s.type))).map((type, i) => {
               const sensor = sensorIconMap[type];
+              if (!sensor) return null; // 보호 코드
+
               return (
                 <div key={i} className="flex flex-col items-center text-sm text-gray-700 w-24">
                   <div className="flex items-center justify-center gap-2">
                     <img src={sensor.icon} alt={sensor.label} className="w-8 h-8" />
                     <span className="text-xs text-[#FF6065] bg-[#FFF7E4] px-2 py-0.5 rounded-full font-semibold">
-                      1개
+                      {tankData.filter(t => t.sensors.some(s => s.type === type)).length}개
                     </span>
                   </div>
                   <div className="mt-1 text-sm font-semibold text-[#303030]">{sensor.label}</div>
@@ -205,7 +180,7 @@ const SmartAquarium: React.FC = () => {
               name={tank.name}
               sensors={tank.sensors}
               status={tank.status}
-              onClick={() => handleOpenModal(tank.name, tank.status)}
+              onClick={() => handleOpenModal(tank)}
               onLogClick={() => handleLogClick(tank.aquarium_id, tank.name)}
             />
           ))}
@@ -215,9 +190,13 @@ const SmartAquarium: React.FC = () => {
       {/* ✅ 모달 */}
       {showModal && selectedTank && (
         <SensorActivationModal
-          tankName={selectedTank}
+          tankName={selectedTank.name}
           onClose={handleCloseModal}
           onConfirm={handleSensorConfirm}
+          allSensors={allSensors}
+          currentTankSensors={selectedTank.sensors.map(s => s.type)}
+          userId={userId}
+          aquariumId={selectedTank.aquarium_id}
         />
       )}
 
