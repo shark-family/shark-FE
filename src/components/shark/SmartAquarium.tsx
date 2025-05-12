@@ -66,10 +66,22 @@ const SmartAquarium: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleOpenModal = (tankName: string) => {
-    setSelectedTank(tankName);
-    setShowModal(true);
+  const handleOpenModal = (tankName: string, status: string) => {
+    if (status === '가동중') {
+      const confirmed = window.confirm('이 센서 박스를 중지하시겠습니까?');
+      if (confirmed) {
+        setTankData((prev) =>
+          prev.map((tank) =>
+            tank.name === tankName ? { ...tank, status: '비가동' } : tank
+          )
+        );
+      }
+    } else {
+      setSelectedTank(tankName);
+      setShowModal(true);
+    }
   };
+  
 
   const handleCloseModal = () => {
     setSelectedTank(null);
@@ -159,7 +171,7 @@ const SmartAquarium: React.FC = () => {
               name={tank.name}
               sensors={tank.sensors}
               status={tank.status}
-              onClick={tank.status !== '가동중' ? () => handleOpenModal(tank.name) : undefined}
+              onClick={() => handleOpenModal(tank.name, tank.status)}
             />
           ))}
         </div>
