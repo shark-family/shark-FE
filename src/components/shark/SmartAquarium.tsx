@@ -31,6 +31,7 @@ interface SensorBoxProps {
   sensors: { type: string; value: string }[];
   status: string;
   aquarium_id: number;
+  fish_type: string;
 }
 
 const sensorIconMap: Record<string, { label: string; icon: string; bgColor: string }> = {
@@ -70,13 +71,14 @@ const SmartAquarium: React.FC = () => {
         const sensors = (tank.activeSensors || []).map((sensor: any) => ({
           type: typeMap[sensor.type?.toLowerCase?.()] || sensor.type,
           value: sensor.value,
-        }));
+        }));      
 
         return {
           name: tank.name,
           sensors,
           status: tank.status,
           aquarium_id: tank.aquarium_id || tank.id,
+          fish_type: tank.fish_type,
         };
       });
       setTankData(aquariums);
@@ -178,7 +180,7 @@ const SmartAquarium: React.FC = () => {
                   <div className="flex items-center justify-center gap-2">
                     <img src={sensor.icon} alt={sensor.label} className="w-8 h-8" />
                     <span className="text-xs text-[#FF6065] bg-[#FFF7E4] px-2 py-0.5 rounded-full font-semibold">
-                      {tankData.filter(t => t.sensors.some(s => s.type === type)).length}개
+                      {allSensors.filter(s => s.type === type).length}개
                     </span>
                   </div>
                   <div className="mt-1 text-sm font-semibold text-[#303030]">{sensor.label}</div>
@@ -197,6 +199,7 @@ const SmartAquarium: React.FC = () => {
               sensors={tank.sensors}
               status={tank.status}
               aquariumId={tank.aquarium_id}
+              fish_type={tank.fish_type}
               onClick={() => handleOpenModal(tank)}
               onLogClick={() => handleLogClick(tank.aquarium_id, tank.name)}
               onSensorStop={handleSensorStop}

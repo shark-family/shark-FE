@@ -6,6 +6,7 @@ interface SensorBoxProps {
   sensors: { type: string; value: string }[];
   status: string;
   aquariumId: number;
+  fish_type: string;
   onClick?: () => void;
   onLogClick?: () => void;
   onSensorStop?: (sensorType: string) => void;
@@ -20,14 +21,25 @@ const colorMap: Record<string, string> = {
   '탁도': 'text-gray-500',
 };
 
-const SensorBox: React.FC<SensorBoxProps> = ({ name, sensors, status, aquariumId, onClick, onLogClick, onSensorStop }) => {
+const SensorBox: React.FC<SensorBoxProps> = ({ name, sensors, status, aquariumId, fish_type, onClick, onLogClick, onSensorStop }) => {
   const handleSensorStop = async (e: React.MouseEvent, sensorType: string) => {
     e.stopPropagation();
     if (!confirm(`${sensorType} 센서를 정말 작동 중지하시겠습니까?`)) return;
 
     try {
+      const reverseTypeMap: Record<string, string> = {
+        'PH': 'ph',
+        '암모니아': 'nh4',
+        '용존 산소': 'do',
+        '온도': 'temp',
+        '염도': 'salt',
+        '탁도': 'turbi',
+      };
+
+      const mappedType = reverseTypeMap[sensorType] || sensorType;
       const sensorIdResponse = await axiosInstance.get(`/api/user-info/관리자A`);
-      const sensor = sensorIdResponse.data.sensors.find((s: any) => s.type === sensorType);
+      const sensor = sensorIdResponse.data.sensors.find((s: any) => s.type.toLowerCase() === mappedType.toLowerCase());
+
       if (!sensor) throw new Error('센서 ID 조회 실패');
 
       const res = await axiosInstance.post('/api/stop-sensor', {
@@ -36,7 +48,7 @@ const SensorBox: React.FC<SensorBoxProps> = ({ name, sensors, status, aquariumId
 
       alert(res.data.status || '센서 작동 중지 완료');
     } catch (err: any) {
-      console.error(err);
+      console.error('❌ 작동 중지 실패:', err.response?.data || err);
       alert(err?.response?.data?.status || '❌ 작동 중지 실패');
     }
   };
@@ -83,7 +95,7 @@ const SensorBox: React.FC<SensorBoxProps> = ({ name, sensors, status, aquariumId
 
       <div className="flex justify-between items-center w-full">
         <div className="text-sm text-[#4E6890]">
-          어종 : <span className="font-semibold text-[#4E6890]">연어</span>
+          <p className="text-sm text-gray-600 mt-1">어종 : {fish_type}</p>
         </div>
         <button
           onClick={(e) => {
