@@ -16,7 +16,6 @@ const SensorActivationModal: React.FC<SensorActivationModalProps> = ({
   onClose,
   onConfirm,
   allSensors,
-  currentTankSensors,
   userId,
   aquariumId,
 }) => {

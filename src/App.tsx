@@ -1,4 +1,3 @@
-import React from 'react';
 import SmartAquarium from './components/shark/SmartAquarium';
 
 function App() {

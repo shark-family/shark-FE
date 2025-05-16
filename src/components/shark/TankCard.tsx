@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import SensorIcon from "./SensorIcon";
 
 interface TankCardProps {
   tankId: string;

@@ -21,7 +21,7 @@ const colorMap: Record<string, string> = {
   '탁도': 'text-gray-500',
 };
 
-const SensorBox: React.FC<SensorBoxProps> = ({ name, sensors, status, aquariumId, fish_type, onClick, onLogClick, onSensorStop }) => {
+const SensorBox: React.FC<SensorBoxProps> = ({ name, sensors, status, fish_type, onClick, onLogClick }) => {
   const handleSensorStop = async (e: React.MouseEvent, sensorType: string) => {
     e.stopPropagation();
     if (!confirm(`${sensorType} 센서를 정말 작동 중지하시겠습니까?`)) return;

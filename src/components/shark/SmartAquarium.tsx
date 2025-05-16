@@ -4,9 +4,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Home,
   Map,
-  Settings,
   Zap,
-  HelpCircle,
 } from 'lucide-react';
 import PHIcon from '../../assets/PH.svg';
 import TemperatureIcon from '../../assets/Temperature.svg';
