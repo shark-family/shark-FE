@@ -148,7 +148,7 @@ const SmartAquarium: React.FC = () => {
           </nav>
         </div>
         <div className="px-6 py-4 text-xs text-gray-400 border-t">
-          <img src="https://upload.wikimedia.org/wikipedia/ko/6/66/Kongju.png" alt="공주대학교" className="w-8 h-8 mb-2" />
+          <img src="https://ipsi.kongju.ac.kr/images/core/logo2.png" alt="공주대학교" className="w-8 h-8 mb-2" />
           공주대학교
         </div>
       </aside>
