@@ -89,6 +89,17 @@ const SmartAquarium: React.FC = () => {
     refetchData();
   }, []);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      console.log('🔄 5분 간격 자동 새로고침 중...');
+      refetchData();
+    }, 1 * 60 * 1000); // 5분 = 300,000ms
+
+    // 컴포넌트 언마운트 시 인터벌 제거
+    return () => clearInterval(intervalId);
+  }, []);
+
+
   const handleOpenModal = (tank: SensorBoxProps) => {
     setSelectedTank(tank);
     setShowModal(true);
