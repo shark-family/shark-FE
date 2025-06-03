@@ -1,11 +1,6 @@
 // ✅ SmartAquarium.tsx
 
 import React, { useEffect, useState } from 'react';
-import {
-  Home,
-  Map,
-  Zap,
-} from 'lucide-react';
 import PHIcon from '../../assets/PH.svg';
 import TemperatureIcon from '../../assets/Temperature.svg';
 import AmmoniaIcon from '../../assets/ammonia.svg';
@@ -16,7 +11,6 @@ import SensorBox from './SensorBox';
 import SensorActivationModal from './SensorActivationModal';
 import axiosInstance from '../../axiosInstance';
 import LogModal from './LogModal';
-import Sidebar from './Sidebar';
 
 interface LogEntry {
   sensor_type: string;
