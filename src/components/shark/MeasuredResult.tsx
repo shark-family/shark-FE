@@ -6,17 +6,19 @@ const CardItem = ({
   title,
   value,
   hasChart = false,
+  className = '',
 }: {
   title: string;
   value: string;
   hasChart?: boolean;
+  className?: string;
 }) => (
-  <div className="bg-white rounded-2xl shadow p-4 relative">
+  <div className={`bg-white rounded-2xl shadow p-4 relative ${className}`}>
     <div className="flex justify-between items-center mb-1">
       <p className="text-sm text-gray-500">{title}</p>
       {hasChart && <Info size={14} className="text-gray-400" />}
     </div>
-    <p className="text-xl font-bold text-[#303030]">{value}</p>
+    <p className="text-2xl font-bold text-[#303030]">{value}</p>
     {hasChart && (
       <div className="mt-2">
         {/* 간단한 미니 차트 (SVG 대체 가능) */}
@@ -47,13 +49,10 @@ const MeasuredResult: React.FC = () => {
       {/* 필터 선택 */}
       <div className="flex flex-wrap gap-4 mb-6">
         <select className="p-2 rounded-md border text-sm">
-          <option>Date: 2024/12/19</option>
+          <option>Date : 2025/06/13</option>
         </select>
         <select className="p-2 rounded-md border text-sm">
-          <option>AGV: AGV1</option>
-        </select>
-        <select className="p-2 rounded-md border text-sm">
-          <option>Number: All</option>
+          <option>AGV : AGV1</option>
         </select>
       </div>
 
@@ -63,19 +62,13 @@ const MeasuredResult: React.FC = () => {
         <div className="flex-1 space-y-6">
           {/* 메인 카드들 */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <CardItem title="가동중인 AGV" value="7/10" />
-        <CardItem title="AGV1 배터리" value="75%" />
-        <CardItem title="AGV1 가동 가능 시간" value="2h 34m" />
+        <CardItem title="가동중인 AGV" value="7/10" className="min-h-[120px]" />
+        <CardItem title="AGV1 배터리" value="75%" className="min-h-[120px]" />
+        <CardItem title="AGV1 가동 가능 시간" value="2h 34m" className="min-h-[120px]" />
         <CardItem title="양식장 내부 온도" value="21°C" hasChart />
         <CardItem title="양식장 내부 습도" value="86%" hasChart />
         <CardItem title="AGV1 측정 수조 번호" value="3번 수조" />
       </div>
-
-          {/* 양식장 구조 이미지 */}
-          <div className="bg-white rounded-2xl shadow p-4">
-            <h3 className="font-semibold mb-2">양식장 구조</h3>
-            <img src="/aquarium-structure.png" alt="Structure" className="rounded-md w-full" />
-          </div>
 
           {/* 실시간 어류 카메라 영상 */}
           <div className="bg-white rounded-2xl shadow p-4">
@@ -132,22 +125,88 @@ const MeasuredResult: React.FC = () => {
             </div>
           </div>
 
-          {/* 수질 센서 데이터 */}
+          {/* 이상 감지 현황 */}
           <div className="bg-white rounded-2xl shadow p-4">
-            <h3 className="font-semibold mb-2">수질 센서 데이터</h3>
-            <ul className="space-y-2 text-sm">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-semibold">이상 감지 현황</h3>
+              <select className="text-sm text-gray-500">
+                <option>정렬 기준</option>
+                <option>온도</option>
+                <option>DO 수치</option>
+                <option>이상 항목 수</option>
+              </select>
+            </div>
+            <ul className="space-y-3 text-sm">
               {[
-                { tank: '수조3', agv: 'AGV1', temp: '14°C', status: '적정', rank: 1 },
-                { tank: '수조6', agv: 'AGV6', temp: '13°C', status: '적정', rank: 2 },
-                { tank: '수조4', agv: 'AGV4', temp: '12°C', status: '적정', rank: 3 },
-                { tank: '수조1', agv: 'AGV3', temp: '11°C', status: '낮음', rank: 4 },
-                { tank: '수조2', agv: 'AGV2', temp: '10°C', status: '낮음', rank: 5 },
-              ].map((item, i) => (
-                <li key={i} className="flex justify-between border-b py-2">
-                  <span>
-                    {item.tank} - {item.agv} / 온도: {item.temp} / 상태: {item.status}
-                  </span>
-                  <span className="font-bold text-green-500">{item.rank}</span>
+                {
+                  tank: '수조3',
+                  agv: 'AGV1',
+                  status: '정상 작동',
+                  sensor: '온도',
+                  value: '14°C',
+                  badge: 'green',
+                },
+                {
+                  tank: '수조6',
+                  agv: 'AGV6',
+                  status: '이상 감지 : NH4 농도 높음',
+                  sensor: 'NH4',
+                  value: '2.8ppm',
+                  badge: 'red',
+                },
+                {
+                  tank: '수조1',
+                  agv: 'AGV3',
+                  status: '정상 작동',
+                  sensor: '온도',
+                  value: '11°C',
+                  badge: 'green',
+                },
+                {
+                  tank: '수조2',
+                  agv: 'AGV2',
+                  status: '주의 : DO 수치 낮음',
+                  sensor: 'DO',
+                  value: '2.1mg/L',
+                  badge: 'yellow',
+                },
+                {
+                  tank: '수조8',
+                  agv: 'AGV8',
+                  status: '데이터 없음',
+                  sensor: '',
+                  value: '',
+                  badge: 'gray',
+                },
+              ].map((item, idx) => (
+                <li
+                  key={idx}
+                  className="flex justify-between items-start p-3 rounded-lg border border-gray-100 hover:bg-gray-50"
+                >
+                  <div className="flex gap-2 items-start">
+                    <div
+                      className={`w-3 h-3 mt-1 rounded-full ${
+                        item.badge === 'green'
+                          ? 'bg-green-500'
+                          : item.badge === 'red'
+                          ? 'bg-red-500'
+                          : item.badge === 'yellow'
+                          ? 'bg-yellow-400'
+                          : 'bg-gray-400'
+                      }`}
+                    />
+                    <div>
+                      <p className="font-medium">
+                        {item.tank} - {item.agv}
+                      </p>
+                      <p className="text-sm text-gray-600">{item.status}</p>
+                      {item.value && (
+                        <p className="text-xs text-gray-400">
+                          {item.sensor}: {item.value}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
