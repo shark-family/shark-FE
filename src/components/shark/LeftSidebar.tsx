@@ -11,7 +11,7 @@ const Sidebar: React.FC = () => {
   const navItems = [
     { label: 'Measured Result', icon: <Home size={18} />, href: '/measuredresult' },
     { label: 'Sensor Control', icon: <Zap size={18} />, href: '/' },
-    { label: 'Detail Map', icon: <Map size={18} />, href: '/map' },
+    { label: 'Detail Map', icon: <Map size={18} />, href: '/detailmap' },
     { label: 'Dash Board', icon: <>📊</>, href: '/dashboard' },
   ];
 
