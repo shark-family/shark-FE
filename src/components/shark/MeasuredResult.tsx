@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Download, Info } from 'lucide-react';
 import AGVVideo from '../../assets/AGV.mp4';
 
@@ -36,14 +36,34 @@ const CardItem = ({
 );
 
 const MeasuredResult: React.FC = () => {
+  const [barHeights, setBarHeights] = useState<number[]>(Array(10).fill(0));
+  const handleDownload = () => {
+    const link = document.createElement('a');
+    link.href = '/SmartAquarium_DB_report.xlsx'; // public 폴더 기준
+    link.download = 'SmartAquarium_DB_report.xlsx';
+    link.click();
+  };
+
+  useEffect(() => {
+    // mount 시 랜덤 높이로 전환 → 트랜지션 발생
+    const newHeights = Array.from({ length: 10 }).map(() =>
+      Math.floor(Math.random() * 80 + 10)
+    );
+    setBarHeights(newHeights);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 p-6">
       {/* 헤더 */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Measured Result</h2>
-        <button className="text-sm text-gray-500 flex items-center gap-1">
+        <button
+          className="text-sm text-gray-500 flex items-center gap-1"
+          onClick={handleDownload}
+        >
           <Download size={16} /> Download
         </button>
+
       </div>
 
       {/* 필터 선택 */}
@@ -61,27 +81,27 @@ const MeasuredResult: React.FC = () => {
         {/* 왼쪽 영역 */}
         <div className="flex-1 space-y-6">
           {/* 메인 카드들 */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <CardItem title="가동중인 AGV" value="7/10" className="min-h-[120px]" />
-        <CardItem title="AGV1 배터리" value="75%" className="min-h-[120px]" />
-        <CardItem title="AGV1 가동 가능 시간" value="2h 34m" className="min-h-[120px]" />
-        <CardItem title="양식장 내부 온도" value="21°C" hasChart />
-        <CardItem title="양식장 내부 습도" value="86%" hasChart />
-        <CardItem title="AGV1 측정 수조 번호" value="3번 수조" />
-      </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <CardItem title="가동중인 AGV" value="7/10" className="min-h-[120px]" />
+            <CardItem title="AGV1 배터리" value="75%" className="min-h-[120px]" />
+            <CardItem title="AGV1 가동 가능 시간" value="2h 34m" className="min-h-[120px]" />
+            <CardItem title="양식장 내부 온도" value="21°C" hasChart />
+            <CardItem title="양식장 내부 습도" value="86%" hasChart />
+            <CardItem title="AGV1 측정 수조 번호" value="3번 수조" />
+          </div>
 
           {/* 실시간 어류 카메라 영상 */}
           <div className="bg-white rounded-2xl shadow p-4">
             <h3 className="font-semibold mb-2">AGV1 실시간 측정 영상</h3>
             <video
-                src={AGVVideo}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="rounded-md w-full"
+              src={AGVVideo}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="rounded-md w-full"
             />
-            </div>
+          </div>
         </div>
 
         {/* 오른쪽 영역 */}
@@ -107,21 +127,26 @@ const MeasuredResult: React.FC = () => {
               </div>
 
               {/* 막대들 */}
-              {Array.from({ length: 10 }).map((_, idx) => {
-                const height = Math.floor(Math.random() * 80 + 10);
+              {barHeights.map((height, idx) => {
                 const status = idx <= 4 ? 'active' : idx <= 6 ? 'charging' : 'inactive';
                 const barColor =
-                  status === 'active' ? 'bg-blue-500'
-                  : status === 'charging' ? 'bg-yellow-400'
-                  : 'bg-gray-300';
+                  status === 'active'
+                    ? 'bg-blue-500'
+                    : status === 'charging'
+                      ? 'bg-yellow-400'
+                      : 'bg-gray-300';
 
                 return (
                   <div key={idx} className="flex flex-col items-center flex-1">
-                    <div className={`w-3 ${barColor} rounded-t transition-all`} style={{ height }} />
+                    <div
+                      className={`w-3 ${barColor} rounded-t transition-all duration-1000`}
+                      style={{ height }}
+                    />
                     <p className="text-xs mt-1 text-gray-600">AGV{idx + 1}</p>
                   </div>
                 );
               })}
+
             </div>
           </div>
 
@@ -185,15 +210,14 @@ const MeasuredResult: React.FC = () => {
                 >
                   <div className="flex gap-2 items-start">
                     <div
-                      className={`w-3 h-3 mt-1 rounded-full ${
-                        item.badge === 'green'
+                      className={`w-3 h-3 mt-1 rounded-full ${item.badge === 'green'
                           ? 'bg-green-500'
                           : item.badge === 'red'
-                          ? 'bg-red-500'
-                          : item.badge === 'yellow'
-                          ? 'bg-yellow-400'
-                          : 'bg-gray-400'
-                      }`}
+                            ? 'bg-red-500'
+                            : item.badge === 'yellow'
+                              ? 'bg-yellow-400'
+                              : 'bg-gray-400'
+                        }`}
                     />
                     <div>
                       <p className="font-medium">
