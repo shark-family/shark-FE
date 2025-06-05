@@ -27,6 +27,13 @@ interface SensorBoxProps {
   fish_type: string;
 }
 
+interface AnomalyRecord {
+  aquarium_id: number;
+  sensor_type: string;
+  value: number;
+  created_at: string;
+}
+
 const sensorIconMap: Record<string, { label: string; icon: string; bgColor: string }> = {
   '염도': { label: '염도', icon: SalinityIcon, bgColor: 'bg-[#FFF6D4]' },
   '탁도': { label: '탁도', icon: TurbidityIcon, bgColor: 'bg-[#E6D8CD]' },
@@ -45,7 +52,22 @@ const SmartAquarium: React.FC = () => {
   const [logModalOpen, setLogModalOpen] = useState(false);
   const [selectedLogs, setSelectedLogs] = useState<LogEntry[]>([]);
   const [selectedTankName, setSelectedTankName] = useState<string>('');
+  const [anomalyMap, setAnomalyMap] = useState<Record<number, boolean>>({});
 
+  const fetchAnomalies = async () => {
+    try {
+      const res = await axiosInstance.get('/api/anomaly-recent');
+      const map: Record<number, boolean> = {};
+      res.data.forEach((item: any) => {
+        map[item.aquarium_id] = true;
+      });
+      setAnomalyMap(map);
+    } catch (err) {
+      console.error('❌ 이상치 데이터 불러오기 실패:', err);
+    }
+  };
+
+  
   const refetchData = async () => {
     try {
       const res = await axiosInstance.get('/api/user-info/관리자A');
@@ -75,6 +97,7 @@ const SmartAquarium: React.FC = () => {
         };
       });
       setTankData(aquariums);
+      await fetchAnomalies();
     } catch (err) {
       console.error('❌ 데이터 불러오기 실패:', err);
     }
@@ -173,23 +196,30 @@ const SmartAquarium: React.FC = () => {
           </div>
         </div>
 
-        {/* ✅ 수조 카드 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {tankData.map((tank, idx) => (
-            <SensorBox
+            {/* ✅ 수조 카드 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {tankData.map((tank, idx) => {
+          const isAnomalous = anomalyMap[tank.aquarium_id];
+          return (
+            <div
               key={idx}
-              name={tank.name}
-              sensors={tank.sensors}
-              status={tank.status}
-              aquariumId={tank.aquarium_id}
-              fish_type={tank.fish_type}
-              onClick={() => handleOpenModal(tank)}
-              onLogClick={() => handleLogClick(tank.aquarium_id, tank.name)}
-              onSensorStop={handleSensorStop}
-            />
-          ))}
-        </div>
-      </main>
+              className={isAnomalous ? 'border-2 border-red-500 rounded-2xl' : ''}
+            >
+              <SensorBox
+                name={tank.name}
+                sensors={tank.sensors}
+                status={tank.status}
+                aquariumId={tank.aquarium_id}
+                fish_type={tank.fish_type}
+                onClick={() => handleOpenModal(tank)}
+                onLogClick={() => handleLogClick(tank.aquarium_id, tank.name)}
+                onSensorStop={handleSensorStop}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </main>
 
       {/* ✅ 모달 */}
       {showModal && selectedTank && (
