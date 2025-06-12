@@ -27,13 +27,6 @@ interface SensorBoxProps {
   fish_type: string;
 }
 
-interface AnomalyRecord {
-  aquarium_id: number;
-  sensor_type: string;
-  value: number;
-  created_at: string;
-}
-
 const sensorIconMap: Record<string, { label: string; icon: string; bgColor: string }> = {
   '염도': { label: '염도', icon: SalinityIcon, bgColor: 'bg-[#FFF6D4]' },
   '탁도': { label: '탁도', icon: TurbidityIcon, bgColor: 'bg-[#E6D8CD]' },
