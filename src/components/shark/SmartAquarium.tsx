@@ -2,11 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import PHIcon from '../../assets/PH.svg';
-import TemperatureIcon from '../../assets/Temperature.svg';
-import AmmoniaIcon from '../../assets/ammonia.svg';
+// import TemperatureIcon from '../../assets/Temperature.svg';
+// import AmmoniaIcon from '../../assets/ammonia.svg';
 import OxygenIcon from '../../assets/oxygen.svg';
 import SalinityIcon from '../../assets/EC.svg';
 import TurbidityIcon from '../../assets/turbidity.svg';
+
+// 새 아이콘 추가
+import OrpIcon from '../../assets/ORP.svg';
+import TdsIcon from '../../assets/TDS.svg';
 
 import SensorBox from './SensorBox';
 import SensorActivationModal from './SensorActivationModal';
@@ -36,8 +40,8 @@ const sensorIconMap: Record<
   'EC': { label: 'EC', icon: SalinityIcon, bgColor: 'bg-[#FFF6D4]' },
   '탁도': { label: '탁도', icon: TurbidityIcon, bgColor: 'bg-[#E6D8CD]' },
   '용존 산소': { label: '용존 산소', icon: OxygenIcon, bgColor: 'bg-[#E1F3FF]' },
-  '전기전도도': { label: '전기전도도', icon: AmmoniaIcon, bgColor: 'bg-[#DFFFEF]' },
-  'ORP': { label: 'ORP', icon: TemperatureIcon, bgColor: 'bg-[#E5F5FF]' },
+  '전기전도도': { label: '전기전도도', icon: TdsIcon, bgColor: 'bg-[#DFFFEF]' },
+  'ORP': { label: 'ORP', icon: OrpIcon, bgColor: 'bg-[#E5F5FF]' },
   'PH': { label: 'PH', icon: PHIcon, bgColor: 'bg-[#F1FFE3]' },
 
   // 새 아이콘
