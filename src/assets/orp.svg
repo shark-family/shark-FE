@@ -1,0 +1,31 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">ORP Icon</title>
+  <desc id="desc">A circular badge with an oxidation-reduction symbol and ORP text</desc>
+
+  <!-- 배경 원 (연한 톤) -->
+  <defs>
+    <linearGradient id="orpBg" x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0F7FF"></stop>
+      <stop offset="1" stop-color="#EAF5FF"></stop>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="28" fill="url(#orpBg)"></circle>
+  <!-- 테두리 -->
+  <circle cx="32" cy="32" r="28" stroke="#D6E6FF" stroke-width="2"></circle>
+
+  <!-- 전극/산화·환원 심볼 -->
+  <!-- 전극 바 -->
+  <path d="M26 18 v14" stroke="#7AA7FF" stroke-width="2.5" stroke-linecap="round"></path>
+  <path d="M38 18 v14" stroke="#7AA7FF" stroke-width="2.5" stroke-linecap="round"></path>
+  <!-- 전자 흐름(산화/환원 화살표) -->
+  <path d="M22 35c3 0 5.5-2.5 5.5-5.5" stroke="#52C41A" stroke-width="2.5" stroke-linecap="round"></path>
+  <path d="M42 29.5c0 3-2.5 5.5-5.5 5.5" stroke="#FA541C" stroke-width="2.5" stroke-linecap="round"></path>
+  <path d="M27.5 24.5l1.8 1.8" stroke="#52C41A" stroke-width="2.5" stroke-linecap="round"></path>
+  <path d="M36.5 33.5l1.8 1.8" stroke="#FA541C" stroke-width="2.5" stroke-linecap="round"></path>
+
+  <!-- 하단 텍스트: ORP -->
+  <text x="32" y="46" text-anchor="middle" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" font-size="12" font-weight="700" fill="#2F54EB" letter-spacing="0.5">
+    ORP
+  </text>
+</svg>
