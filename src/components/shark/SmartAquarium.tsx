@@ -8,10 +8,6 @@ import OxygenIcon from '../../assets/oxygen.svg';
 import SalinityIcon from '../../assets/EC.svg';
 import TurbidityIcon from '../../assets/turbidity.svg';
 
-// 새 아이콘 추가
-import OrpIcon from '../../assets/ORP.svg';
-import TdsIcon from '../../assets/TDS.svg';
-
 import SensorBox from './SensorBox';
 import SensorActivationModal from './SensorActivationModal';
 import axiosInstance from '../../axiosInstance';
