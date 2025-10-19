@@ -5,12 +5,12 @@ import PHIcon from '../../assets/PH.svg';
 import TemperatureIcon from '../../assets/Temperature.svg';
 import AmmoniaIcon from '../../assets/ammonia.svg';
 import OxygenIcon from '../../assets/oxygen.svg';
-import SalinityIcon from '../../assets/salinity.svg';
+import SalinityIcon from '../../assets/EC.svg';
 import TurbidityIcon from '../../assets/turbidity.svg';
 
 // 새 아이콘 추가
-import OrpIcon from '../../assets/orp.svg';
-import TdsIcon from '../../assets/tds.svg';
+import OrpIcon from '../../assets/ORP.svg';
+import TdsIcon from '../../assets/TDS.svg';
 
 import SensorBox from './SensorBox';
 import SensorActivationModal from './SensorActivationModal';
@@ -37,16 +37,16 @@ const sensorIconMap: Record<
   string,
   { label: string; icon: string; bgColor: string }
 > = {
-  '염도': { label: '염도', icon: SalinityIcon, bgColor: 'bg-[#FFF6D4]' },
+  'EC': { label: 'EC', icon: SalinityIcon, bgColor: 'bg-[#FFF6D4]' },
   '탁도': { label: '탁도', icon: TurbidityIcon, bgColor: 'bg-[#E6D8CD]' },
   '용존 산소': { label: '용존 산소', icon: OxygenIcon, bgColor: 'bg-[#E1F3FF]' },
-  '암모니아': { label: '암모니아', icon: AmmoniaIcon, bgColor: 'bg-[#DFFFEF]' },
-  '온도': { label: '온도', icon: TemperatureIcon, bgColor: 'bg-[#E5F5FF]' },
+  '전기전도도': { label: '전기전도도', icon: AmmoniaIcon, bgColor: 'bg-[#DFFFEF]' },
+  'ORP': { label: 'ORP', icon: TemperatureIcon, bgColor: 'bg-[#E5F5FF]' },
   'PH': { label: 'PH', icon: PHIcon, bgColor: 'bg-[#F1FFE3]' },
 
   // 새 아이콘
-  'ORP': { label: 'ORP', icon: OrpIcon, bgColor: 'bg-[#EFEFFF]' },
-  'TDS': { label: 'TDS', icon: TdsIcon, bgColor: 'bg-[#F0F7FF]' },
+  //'ORP': { label: 'ORP', icon: OrpIcon, bgColor: 'bg-[#EFEFFF]' },
+  //'TDS': { label: 'TDS', icon: TdsIcon, bgColor: 'bg-[#F0F7FF]' },
 };
 
 const SmartAquarium: React.FC = () => {
@@ -82,17 +82,18 @@ const SmartAquarium: React.FC = () => {
         // 현재 DB 컬럼명 기준
         ph: 'PH',
         do_val: '용존 산소',
-        ec: '염도',
+        do: '용존 산소',
+        ec: 'EC',
         turbidity: '탁도',
-        tds: 'TDS',
+        tds: '전기전도도',
         orp: 'ORP',
 
         // (있을 수 있는 과거 키 하위호환)
-        do: '용존 산소',
-        salt: '염도',
-        turbi: '탁도',
-        nh4: '암모니아',
-        temp: '온도',
+        // do: '용존 산소',
+        // salt: '염도',
+        // turbi: '탁도',
+        // nh4: '암모니아',
+        // temp: '온도',
       };
 
       // 상단 “가용 센서 현황”

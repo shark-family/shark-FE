@@ -37,13 +37,13 @@ const SensorAvailability: React.FC = () => {
         />
       </div>
       <div className="flex flex-wrap gap-10 items-center mx-5 mt-1.5 text-sm tracking-tight text-center min-h-[31px] max-md:mr-2.5">
-        <div className="grow shrink self-stretch my-auto w-[45px]">염도</div>
+        <div className="grow shrink self-stretch my-auto w-[45px]">EC</div>
         <div className="grow shrink self-stretch my-auto w-11">탁도</div>
         <div className="grow shrink self-stretch my-auto w-11">용존 산소</div>
         <div className="grow shrink self-stretch my-auto w-[45px]">
-          암모니아
+          전기전도도
         </div>
-        <div className="grow shrink self-stretch my-auto w-11"> 온도</div>
+        <div className="grow shrink self-stretch my-auto w-11"> ORP</div>
         <div className="grow shrink self-stretch my-auto w-11"> PH</div>
       </div>
     </section>

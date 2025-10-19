@@ -20,7 +20,8 @@ const useTankStore = create<TankState>((set) => ({
   })),
 }));
 
-const sensors = ['PH', '용존 산소', '탁도', '온도', '암모니아'];
+// const sensors = ['PH', '용존 산소', '탁도', '온도', '암모니아'];
+const sensors = ['PH', '용존 산소', 'EC', '탁도', '전기전도도', 'ORP']
 
 export default function SmartAquafarm() {
   const { logs, setLog } = useTankStore();

@@ -13,11 +13,11 @@ interface SensorBoxProps {
 }
 
 const colorMap: Record<string, string> = {
-  '온도': 'text-red-500',
+  '전기전도도': 'text-red-500',
   '용존 산소': 'text-blue-500',
-  '염도': 'text-yellow-500',
+  'EC': 'text-yellow-500',
   'PH': 'text-green-500',
-  '암모니아': 'text-purple-500',
+  'ORP': 'text-purple-500',
   '탁도': 'text-gray-500',
 };
 
@@ -29,11 +29,11 @@ const SensorBox: React.FC<SensorBoxProps> = ({ name, sensors, status, fish_type,
     try {
       const reverseTypeMap: Record<string, string> = {
         'PH': 'ph',
-        '암모니아': 'nh4',
-        '용존 산소': 'do',
-        '온도': 'temp',
-        '염도': 'salt',
-        '탁도': 'turbi',
+        '전기전도도': 'tds',
+        '용존 산소': 'do_val',
+        'ORP': 'orp',
+        'EC': 'ec',
+        '탁도': 'turbidity',
       };
 
       const mappedType = reverseTypeMap[sensorType] || sensorType;
