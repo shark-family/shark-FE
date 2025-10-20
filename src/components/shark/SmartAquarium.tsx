@@ -11,6 +11,7 @@ import TurbidityIcon from '../../assets/turbidity.svg';
 // 새 아이콘 추가
 import OrpIcon from '../../assets/ORP.svg';
 import TdsIcon from '../../assets/TDS.svg';
+import ECIcon from '../../assets/EC.svg';
 
 import SensorBox from './SensorBox';
 import SensorActivationModal from './SensorActivationModal';
@@ -37,10 +38,10 @@ const sensorIconMap: Record<
   string,
   { label: string; icon: string; bgColor: string }
 > = {
-  'EC': { label: 'EC', icon: SalinityIcon, bgColor: 'bg-[#FFF6D4]' },
   '탁도': { label: '탁도', icon: TurbidityIcon, bgColor: 'bg-[#E6D8CD]' },
   '용존 산소': { label: '용존 산소', icon: OxygenIcon, bgColor: 'bg-[#E1F3FF]' },
-  '전기전도도': { label: '전기전도도', icon: TdsIcon, bgColor: 'bg-[#DFFFEF]' },
+  '전기전도도': { label: '전기전도도', icon: ECIcon, bgColor: 'bg-[#DFFFEF]' },
+  'TDS': { label: 'TDS', icon: TdsIcon, bgColor: 'bg-[#DFFFEF]' },
   'ORP': { label: 'ORP', icon: OrpIcon, bgColor: 'bg-[#E5F5FF]' },
   'PH': { label: 'PH', icon: PHIcon, bgColor: 'bg-[#F1FFE3]' },
 
@@ -77,15 +78,17 @@ const SmartAquarium: React.FC = () => {
     try {
       const res = await axiosInstance.get('/api/user-info/관리자A');
 
+      console.log('백엔드에서 받은 센서 원본 데이터:', res.data.sensors);
+
       // DB/백엔드 타입 → 화면 라벨
       const typeMap: Record<string, string> = {
         // 현재 DB 컬럼명 기준
         ph: 'PH',
         do_val: '용존 산소',
         do: '용존 산소',
-        ec: 'EC',
+        ec: '전기전도도',
         turbidity: '탁도',
-        tds: '전기전도도',
+        tds: 'TDS',
         orp: 'ORP',
 
         // (있을 수 있는 과거 키 하위호환)
