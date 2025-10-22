@@ -4,6 +4,7 @@ import DashboardPage from './components/shark/DashboardPage';
 import DetailMap from './components/shark/DetailMap';
 import Sidebar from './components/shark/LeftSidebar';
 import MeasuredResult from './components/shark/MeasuredResult';
+import CameraView from './components/shark/CameraView';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/measuredresult" element={<MeasuredResult />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/detailmap" element={<DetailMap />} />
+            <Route path="/cameraview" element={<CameraView />} />
           </Routes>
         </main>
       </Router>

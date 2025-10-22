@@ -1,7 +1,7 @@
 // components/shark/Sidebar.tsx
 
 import React from 'react';
-import { Home, Map, Zap, Activity } from 'lucide-react';
+import { Home, Map, Zap, Activity, Camera } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 const Sidebar: React.FC = () => {
@@ -13,6 +13,7 @@ const Sidebar: React.FC = () => {
     { label: 'Sensor Control', icon: <Zap size={18} />, href: '/' },
     { label: 'Detail Map', icon: <Map size={18} />, href: '/detailmap' },
     { label: 'Dash Board', icon: <Activity size={18} />, href: '/dashboard' },
+    { label: 'Camera View', icon: <Camera size={18} />, href: '/cameraview' },
   ];
 
   return (
